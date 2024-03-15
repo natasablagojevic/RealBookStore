@@ -22,6 +22,10 @@ komentar'); insert into persons(firstName, lastName, email) values('Natasa', 'Bl
 
 ![SQL-Injection-Odbrana](./slike/sql_injection_odbrana.png) 
 
-Kada opet pokusamo da izvršimo SQL Injection napad, neće uspeti, već će se samo generisati novi komentar:
+Ukoliko pokusamo ponovo da izvrsimo SQL Injection napad:
+
+![SQL-Injection-Napad2](./slike/sql_injection_napad2.png)
+
+Bicemo onemogućeni da proizvedemo taj napad, jer smo se obezbedili da ne dodje do toga, već će se generisati komentar: 
 
 ![SQL-Injection-Komentar](./slike/sql_injection_komentar.png)
