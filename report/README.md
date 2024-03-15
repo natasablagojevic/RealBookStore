@@ -20,3 +20,8 @@ komentar'); insert into persons(firstName, lastName, email) values('Natasa', 'Bl
 - Predlog odbrane:
     - kako bismo se osigurali da ne bi doslo do ovakvih napada, potrebno je da koristimo parametrizovane upite i PreparedStatement, kao u sledećem delu koda:
 
+![SQL-Injection-Odbrana](./slike/sql_injection_odbrana.png) 
+
+Kada opet pokusamo da izvršimo SQL Injection napad, neće uspeti, već će se samo generisati novi komentar:
+
+![SQL-Injection-Komentar](./slike/sql_injection_komentar.png)
