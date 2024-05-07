@@ -23,8 +23,7 @@ public class CommentRepository {
     }
 
     public void create(Comment comment) {
-//        String query = "insert into comments(bookId, userId, comment) values ('" + comment.getBookId() + ", " + comment.getUserId() + ", '" + comment.getComment() + "')";
-//        String query = "insert into comments(bookId, userId, comment) values ('" + comment.getBookId() + "', '" + comment.getUserId() + "', '" + comment.getComment() + "')";
+//        String query = "insert into comments(bookId, userId, comment) values (" + comment.getBookId() + ", " + comment.getUserId() + ", '" + comment.getComment() + "')";
 
         String query = "insert into comments(bookId, userId, comment) values(?, ?, ?)";
 
