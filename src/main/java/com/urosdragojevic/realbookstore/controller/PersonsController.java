@@ -1,5 +1,6 @@
 package com.urosdragojevic.realbookstore.controller;
 
+import ch.qos.logback.core.joran.spi.ActionException;
 import com.urosdragojevic.realbookstore.audit.AuditLogger;
 import com.urosdragojevic.realbookstore.domain.Person;
 import com.urosdragojevic.realbookstore.domain.User;
@@ -9,7 +10,10 @@ import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +37,7 @@ public class PersonsController {
     }
 
     @GetMapping("/persons/{id}")
+    @PreAuthorize("hasAnyAuthority('VIEW_PERSON')")
     public String person(@PathVariable int id, Model model, HttpSession session) {
         String csrf = session.getAttribute("CSRF_TOKEN").toString();
         model.addAttribute("CSRF_TOKEN", session.getAttribute("CSRF_TOKEN"));
@@ -41,6 +46,7 @@ public class PersonsController {
     }
 
     @GetMapping("/myprofile")
+    @PreAuthorize("hasAuthority('VIEW_MY_PROFILE')")
     public String self(Model model, Authentication authentication) {
         User user = (User) authentication.getPrincipal();
         model.addAttribute("person", personRepository.get("" + user.getId()));
@@ -48,21 +54,43 @@ public class PersonsController {
     }
 
     @DeleteMapping("/persons/{id}")
-    public ResponseEntity<Void> person(@PathVariable int id) {
-        personRepository.delete(id);
-        userRepository.delete(id);
+    @PreAuthorize("hasAuthority('UPDATE_PERSON')")
+    public ResponseEntity<Void> person(@PathVariable int id) throws ActionException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+        int userId = user.getId();
+        boolean hasAuthentication = user.getAuthorities().contains(new SimpleGrantedAuthority("UPDATE_PERSON"));
+
+        if (userId == id || hasAuthentication) {
+            personRepository.delete(id);
+            userRepository.delete(id);
+        }
+        else
+            throw new ActionException("Forbidden action");
 
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/update-person")
-    public String updatePerson(Person person, HttpSession session, @RequestParam("csrfToken") String csrfToken) throws AccessDeniedException {
+    @PreAuthorize("hasAuthority('UPDATE_PERSON')")
+    public String updatePerson(Person person, HttpSession session, @RequestParam("csrfToken") String csrfToken) throws AccessDeniedException, ActionException {
 
         String csrf = session.getAttribute("CSRF_TOKEN").toString();
         if (!csrf.equals(csrfToken))
             throw new AccessDeniedException("Forbidden");
 
-        personRepository.update(person);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+        int userId = user.getId();
+        int id = Integer.parseInt(person.getId());
+        boolean hasAuthentication = user.getAuthorities().contains(new SimpleGrantedAuthority("UPDATE_PERSON"));
+
+        if (userId == id || hasAuthentication) {
+            personRepository.update(person);
+        } else
+            throw new ActionException("Forbidden action");
+
+
         return "redirect:/persons/" + person.getId();
     }
 
@@ -74,6 +102,7 @@ public class PersonsController {
 
     @GetMapping(value = "/persons/search", produces = "application/json")
     @ResponseBody
+    @PreAuthorize("hasAuthority('VIEW_PERSONS_LIST')")
     public List<Person> searchPersons(@RequestParam String searchTerm) throws SQLException {
         return personRepository.search(searchTerm);
     }
