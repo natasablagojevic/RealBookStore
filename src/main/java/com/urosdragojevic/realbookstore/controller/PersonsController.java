@@ -64,6 +64,7 @@ public class PersonsController {
         if (userId == id || hasAuthentication) {
             personRepository.delete(id);
             userRepository.delete(id);
+            AuditLogger.getAuditLogger(PersonsController.class).audit("Delete person with ID: " + id);
         }
         else
             throw new ActionException("Forbidden action");
@@ -87,6 +88,7 @@ public class PersonsController {
 
         if (userId == id || hasAuthentication) {
             personRepository.update(person);
+            AuditLogger.getAuditLogger(PersonsController.class).audit("Update person with ID: " + id);
         } else
             throw new ActionException("Forbidden action");
 

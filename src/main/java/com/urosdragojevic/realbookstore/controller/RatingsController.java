@@ -1,5 +1,6 @@
 package com.urosdragojevic.realbookstore.controller;
 
+import com.urosdragojevic.realbookstore.audit.AuditLogger;
 import com.urosdragojevic.realbookstore.domain.Rating;
 import com.urosdragojevic.realbookstore.repository.RatingRepository;
 import org.slf4j.Logger;
@@ -24,6 +25,8 @@ public class RatingsController {
     public String createOrUpdateRating(@ModelAttribute Rating rating) {
         rating.setUserId(1);
         ratingRepository.createOrUpdate(rating);
+
+        AuditLogger.getAuditLogger(RatingsController.class).audit("Rating for book with ID: " + rating.getBookId());
 
         return "redirect:/books/" + rating.getBookId();
     }

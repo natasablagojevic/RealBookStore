@@ -36,12 +36,12 @@ public class BookRepository {
                 bookList.add(book);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Failed to fetch all books.", e);
         }
         return bookList;
     }
 
-    public List<Book> search(String searchTerm) throws SQLException {
+    public List<Book> search(String searchTerm) {
         List<Book> bookList = new ArrayList<>();
         String query = "SELECT DISTINCT b.id, b.title, b.description, b.author FROM books b, books_to_genres bg, genres g" +
                 " WHERE b.id = bg.bookId" +
@@ -54,6 +54,8 @@ public class BookRepository {
             while (rs.next()) {
                 bookList.add(createBookFromResultSet(rs));
             }
+        } catch (SQLException e) {
+            LOG.warn("Book search failed for searchTerm " + searchTerm, e);
         }
         return bookList;
     }
@@ -67,7 +69,7 @@ public class BookRepository {
                 return createBookFromResultSet(rs);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Get book with ID failed: " + bookId, e);
         }
         return null;
     }
@@ -94,12 +96,12 @@ public class BookRepository {
                         statement2.setInt(2, genre.getId());
                         statement2.executeUpdate();
                     } catch (SQLException e) {
-                        e.printStackTrace();
+                        LOG.error("Failed to insert into books_to_genres {bookID}: " + finalId);
                     }
                 });
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Failed to create book with title: " + book.getTitle(), e);
         }
         return id;
     }
@@ -117,7 +119,7 @@ public class BookRepository {
             statement.executeUpdate(query3);
             statement.executeUpdate(query4);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.error("Failed to delete book with id: " + bookId, e);
         }
     }
 
