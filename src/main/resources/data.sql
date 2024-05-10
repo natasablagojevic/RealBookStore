@@ -37,11 +37,6 @@ values (1, 3, 5),
 insert into comments(bookId, userId, comment)
 values (1, 1, 'They are taking the hobbits to Isengard. P.S. I am not Batman');
 
-insert into roles(name)
-values ('ADMIN'),
-       ('MANAGER'),
-       ('REVIEWER');
-
 insert into roles(id, name)
 values (1, 'ADMIN'),
        (2, 'MANAGER'),
