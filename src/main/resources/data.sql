@@ -71,7 +71,8 @@ values (1, 1),
        (3, 1),
        (3, 2),
        (3, 6),
-       (3, 7);
+       (3, 7),
+       (3, 8);
 
 insert into user_to_roles(userId, roleId)
 values (1, 3),
